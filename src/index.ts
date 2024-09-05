@@ -15,7 +15,7 @@ import DatePicker from "./DatePicker";
 import TimePicker from "./TimePicker";
 import GoogleAutocomplete from "./GoogleAutocomplete";
 import PittsburghAddress from "./PittsburghAddress";
-
+import PermitTicket from "./PermitTicket";
 export {
     Button,
     Input,
@@ -33,5 +33,6 @@ export {
     DatePicker,
     TimePicker,
     GoogleAutocomplete,
-    PittsburghAddress
+    PittsburghAddress,
+	PermitTicket
 };
