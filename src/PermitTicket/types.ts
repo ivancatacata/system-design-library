@@ -1,6 +1,37 @@
 export interface PermitTicketProps {
-    paymentData: PaymentResult;
-    plate: string;
+    paymentData: InvoiceData;
+    logo: any;
+}
+
+interface Recipient {
+    name: string;
+    email: string;
+    address: string;
+    cityStateZip: string;
+}
+
+interface Transaction {
+    number: string;
+    date: string;
+    type: string;
+    cardAmount: string;
+    amount: string;
+}
+
+interface Invoice {
+    date: string;
+    number: string;
+    description: string;
+    price: number;
+    total: number;
+}
+
+export interface InvoiceData {
+    recipient: Recipient;
+    transaction: Transaction;
+    invoices: Invoice[];
+    convenienceFee: number;
+    totalAmount: number;
 }
 
 export enum PaymentStatus {

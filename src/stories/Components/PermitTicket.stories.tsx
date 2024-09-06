@@ -10,52 +10,32 @@ export default {
 export const Default: StoryFn = (args) => {
     return (
         <PermitTicket
-            plate={"TEST123"}
+            logo={"TEST123"}
             paymentData={{
-                billing: {
-                    startDate: "2024-09-05T01:00:00Z",
-                    step: {
-                        endDate: "2024-09-06T02:00:00Z",
-                        duration: 1500,
-                        amount: 0,
-                        amountPlusVat: 0,
-                        amountWithoutBonification: 0,
-                        realAmount: 0,
-                        bonification: 1,
-                        vat: 0,
-                        fee: 0,
-                        feePlusVat: 0,
-                        total: 0,
-                        time: 1500,
-                        timeBalanceUsed: 0
-                    },
-                    payWith: 0
+                recipient: {
+                    name: "DENISE HOLLANO",
+                    email: "(OSPACE304@AOL.COM)",
+                    address: "1140 MURRAY HILL AVENUE",
+                    cityStateZip: "Pittsburgh, Pennsylvania, 15217"
                 },
-                operation: {
-                    id: "350036",
-                    startDate: "2024-09-05T01:00:00Z",
-                    step: {
-                        endDate: "2024-09-06T02:00:00Z",
-                        duration: 1500,
-                        amount: 0,
-                        amountPlusVat: 0,
-                        amountWithoutBonification: 0,
-                        realAmount: 0,
-                        bonification: 1,
-                        vat: 0,
-                        fee: 0,
-                        feePlusVat: 0,
-                        total: 0,
-                        time: 1500,
-                        timeBalanceUsed: 0
-                    },
-                    balance: 0,
-                    timeBalance: 0,
-                    creditCardPan: "**** 1234",
-                    layout: 2
+                transaction: {
+                    number: "0190914YY",
+                    date: "2024-05-16",
+                    type: "Check",
+                    cardAmount: "4875",
+                    amount: "20.00"
                 },
-                status: 3,
-                deferred: false
+                invoices: [
+                    {
+                        date: "2024-05-16",
+                        number: "#258332YY",
+                        description: "Annual RPP - (05/16/2024 - 05/31/2025) - Z HONDA FRPAND(APA)",
+                        price: 20.0,
+                        total: 20.0
+                    }
+                ],
+                convenienceFee: 0.0,
+                totalAmount: 20.0
             }}
             {...args}
         />

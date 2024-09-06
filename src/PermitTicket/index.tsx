@@ -1,256 +1,252 @@
 import React from "react";
 import { IconButton } from "@mui/material";
-import { Stack} from "@mui/system";
-import { PaymentResult, PayWith, PermitTicketProps } from "./types";
-import {
-  Page,
-  Text,
-  View,
-  Document,
-  StyleSheet,
-  usePDF,
-  DocumentProps
-} from "@react-pdf/renderer";
+import { Stack } from "@mui/system";
+import { PermitTicketProps, InvoiceData } from "./types";
+import { Page, Text, View, Document, StyleSheet, usePDF, DocumentProps } from "@react-pdf/renderer";
 import DownloadIcon from "@mui/icons-material/Download";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import Logo from "./logo";
 
 dayjs.extend(utc);
 
 const styles = StyleSheet.create({
-  page: {
-    paddingTop: 16,
-    paddingBottom: 12,
-    paddingLeft: 14,
-    paddingRight: 14,
-    fontFamily: "Helvetica",
-    display: "flex",
-    flexDirection: "column",
-    border: "1px solid white",
-    borderRadius: 8,
-  },
-  container: {
-    marginVertical: 15,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 10,
-    width: 300,
-    backgroundColor: '#f8f9fa',
-    alignSelf: 'center',
-    padding: 10
-  },
-  row: {
-    display:"flex",
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  column: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  text: {
-    fontSize: 12,
-    margin: 0,
-  },
-  divider: {
-    borderBottomWidth: 1,
-    borderColor: '#d3d3d3',
-    marginVertical: 10,
-    borderStyle:"dashed"
-  },
-  boldText: {
-    fontWeight: 'bold',
-  },
+    page: {
+        display: "flex",
+        fontFamily: "Helvetica",
+        flexDirection: "column",
+        backgroundColor: "#FFFFFF",
+        minHeight: "100vh",
+        padding: 30
+    },
+    columnBlock: {
+        display: "flex",
+        flexDirection: "column",
+        fontSize: 11
+    },
+    rowBlock: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        fontSize: 11
+    },
+    transactionBlock: {
+        display: "flex"
+    },
+    table: {
+        display: "flex",
+        flexDirection: "column",
+        width: "auto"
+    },
+    tableRow: {
+        margin: "auto",
+        flexDirection: "row",
+        display: "flex",
+        width: "100%",
+        textAlign: "center",
+        flexGrow: 1,
+        justifyContent: "flex-end"
+    },
+    tableCol: {
+        flexBasis: "14.27%",
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderLeftWidth: 0,
+        borderTopWidth: 0
+    },
+    tableCell: {
+        marginTop: 5,
+        fontSize: 10,
+        display: "flex",
+        justifyContent: "center",
+        textAlign: "center",
+        padding: 5
+    },
+    withBorderTop: {
+        borderTopWidth: 1
+    },
+    withBorderLeft: {
+        borderLeftWidth: 1
+    },
+    disclaimer: {
+        marginTop: 20
+    }
 });
 
-const PermitTicket: React.FC<PermitTicketProps> = ({
-  paymentData,
-  plate
-}) => {
-  const [{ loading, error, ...instance }] = usePDF({
-    document: <PDFDocument paymentData={paymentData} plate={plate} />,
-  });
+const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo }) => {
+    const [{ loading, error, ...instance }] = usePDF({
+        document: <PDFDocument data={paymentData} logo={logo} />
+    });
 
-  console.log({
-    paymentData,
-    loading,
-    error,
-  });
+    console.log({
+        paymentData,
+        loading,
+        error
+    });
 
-  const downloadFile = () => {
-    console.log(instance.blob);
-    let documentObjectURL;
-    if (instance.blob) {
-      documentObjectURL = URL.createObjectURL(instance.blob);
-    }
+    const downloadFile = () => {
+        console.log(instance.blob);
+        let documentObjectURL;
+        if (instance.blob) {
+            documentObjectURL = URL.createObjectURL(instance.blob);
+        }
 
-    if (documentObjectURL) {
-      const a = document.createElement("a");
-      a.href = documentObjectURL;
-      a.download = "ticket.pdf";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  };
+        if (documentObjectURL) {
+            const a = document.createElement("a");
+            a.href = documentObjectURL;
+            a.download = "ticket.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    };
 
-  return (
-    <Stack spacing={2} position={"relative"} py={1} pt={3} px={1.5}>
-      <IconButton
-        onClick={downloadFile}
-        sx={{
-          position: "absolute",
-          top: ".2rem",
-          left: ".6rem",
-          zIndex: 3,
-        }}
-      >
-        <DownloadIcon fontSize="small" />
-      </IconButton>
-      <Stack>
-        <PDFDocument paymentData={paymentData} plate={plate}></PDFDocument>
-      </Stack>
-    </Stack>
-  );
+    return (
+        <Stack spacing={2} position={"relative"} py={1} pt={3} px={1.5}>
+            <IconButton
+                onClick={downloadFile}
+                sx={{
+                    position: "absolute",
+                    top: ".2rem",
+                    left: ".6rem",
+                    zIndex: 3
+                }}
+            >
+                <DownloadIcon fontSize="small" />
+            </IconButton>
+            <Stack>
+                <PDFDocument data={paymentData} logo={logo}></PDFDocument>
+            </Stack>
+        </Stack>
+    );
 };
 
 interface PDFDocumentProps extends DocumentProps {
-  paymentData: PaymentResult;
-  plate: string
+    data: any;
+    logo: any;
 }
 
-const PDFDocument: React.FC<PDFDocumentProps> = ({ paymentData, plate}) => {
-  // const [qrCodeData, setQrCodeData] = React.useState("");
+const PDFDocument: React.FC<PDFDocumentProps> = ({ data }: { data: InvoiceData }) => {
+    return (
+        <Document>
+            <Page size={"A4"} style={styles.page}>
+                <View style={{ flexGrow: 1 }}>
+                    <View style={{ ...styles.rowBlock, marginBottom: 30 }}>
+                        <View style={styles.columnBlock}>
+                            <Text>Pittsburgh Parking Authority</Text>
+                            <Text>232 Boulevard of the Allies</Text>
+                            <Text>Pittsburgh, PA, 15222</Text>
+                        </View>
+                        <View style={styles.columnBlock}>
+                            <Logo />
+                        </View>
+                    </View>
+                    <View style={styles.rowBlock}>
+                        <View style={styles.columnBlock}>
+                            <Text>{data.recipient.name}</Text>
+                            <Text>{data.recipient.email}</Text>
+                            <Text>{data.recipient.address}</Text>
+                            <Text>{data.recipient.cityStateZip}</Text>
+                        </View>
 
-  // React.useEffect(() => {
-  //   const generateQRCode = async () => {
-  //     try {
-  //       const url = await QRCode.toDataURL('test124241', { errorCorrectionLevel: 'H' });
-  //       setQrCodeData(url);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
+                        <View style={{ ...styles.rowBlock, gap: 8 }}>
+                            <View style={styles.columnBlock}>
+                                <Text style={{ textAlign: "right" }}>Transaction #:</Text>
+                                <Text style={{ textAlign: "right" }}>DATE:</Text>
+                                <Text style={{ textAlign: "right" }}>Card/Cheque Amount#:</Text>
+                                <Text style={{ textAlign: "right" }}>Type:</Text>
+                                <Text style={{ textAlign: "right" }}>Ammount:</Text>
+                            </View>
+                            <View style={styles.columnBlock}>
+                                <Text style={{ color: "red" }}>{data.transaction.number}</Text>
+                                <Text>{dayjs(data.transaction.date).format("MM/DD/YYYY")}</Text>
+                                <Text>{data.transaction.cardAmount}</Text>
+                                <Text>{data.transaction.type}</Text>
+                                <Text>{data.transaction.amount}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={{ display: "flex", justifyContent: "center", marginTop: 30 }}>
+                        <Text style={{ fontSize: 16, marginBottom: 10 }}>Invoices</Text>
+                    </View>
 
-  //   generateQRCode();
-  // }, []);
-  return (
-    <Document>
-      <Page size={"A4"} style={styles.page}>
-        <View style={styles.container}>
-          <View style={styles.row}>
-            {/* <View >
-            {qrCodeData && (
-                <Svg source={qrCodeData} src={qrCodeData} style={{ width: 180, height: 180 }} />
-              )}
-            </View> */}
-            <View style={{ flex: 1 }}>
-             <View>
-              <View style={styles.column}>
-                <View style={styles.row}>
-                  <Text style={styles.text}>
-                    Start Date:
-                  </Text>
-                  <Text style={styles.text}>
-                  {dayjs.utc(paymentData.billing.startDate).format("LTS")}
-                  </Text>
+                    <View style={styles.table}>
+                        <View style={{ ...styles.tableRow, backgroundColor: "#f0f0f0" }}>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderLeft, ...styles.withBorderTop }}>
+                                <Text style={styles.tableCell}>Date</Text>
+                            </View>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderTop }}>
+                                <Text style={styles.tableCell}>Invoice#</Text>
+                            </View>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderTop, flexBasis: "42.856%" }}>
+                                <Text style={styles.tableCell}>Description</Text>
+                            </View>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderTop }}>
+                                <Text style={styles.tableCell}>Price</Text>
+                            </View>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderTop }}>
+                                <Text style={styles.tableCell}>Total</Text>
+                            </View>
+                        </View>
+                        {data.invoices.map((invoice, index) => (
+                            <View style={styles.tableRow} key={index}>
+                                <View style={{ ...styles.tableCol, ...styles.withBorderLeft }}>
+                                    <Text style={styles.tableCell}>{dayjs(invoice.date).format("MM/DD/YYYY")}</Text>
+                                </View>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCell}>{invoice.number}</Text>
+                                </View>
+                                <View
+                                    style={{
+                                        ...styles.tableCol,
+                                        flexBasis: "42.856%"
+                                    }}
+                                >
+                                    <Text style={styles.tableCell}>{invoice.description}</Text>
+                                </View>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCell}>${invoice.price.toFixed(2)}</Text>
+                                </View>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCell}>${invoice.total.toFixed(2)}</Text>
+                                </View>
+                            </View>
+                        ))}
+                        <View style={styles.tableRow}>
+                            <View style={{ ...styles.tableCol, borderBottomWidth: 0 }}></View>
+                            <View style={{ ...styles.tableCol }}>
+                                <Text style={styles.tableCell}>Convenience Fee:</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>${data.convenienceFee.toFixed(2)}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={{ ...styles.tableCol, borderBottomWidth: 0 }}></View>
+                            <View style={{ ...styles.tableCol }}>
+                                <Text style={styles.tableCell}>Total:</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>${data.totalAmount.toFixed(2)}</Text>
+                            </View>
+                        </View>
+                    </View>
                 </View>
-                <View style={styles.row}>
-                  <Text style={styles.text}>
-                  End Date: 
-                  </Text>
-                  <Text style={styles.text}>
-                    {dayjs.utc(paymentData.billing.step.endDate).format("LTS")}
-                  </Text>
+                <View style={{ display: "flex", flexDirection: "column", fontSize: 10 }}>
+                    <Text>Disclaimer:</Text>
+                    <Text style={styles.disclaimer}>
+                        I am a resident of the city, and that i am the owner of the motor vehicle(s) herein described. I
+                        make these representations with the knowledge that they will be relied upon by the Parking
+                        District in issuing a permit. I agree that the city shall not be liable for any loss of, damage
+                        to, or theft of the above-described motor vehicle(s) or its/their contents while the motor
+                        vehicle (s) is/are parked in any permitted parking area within the Parking District. In
+                        accepting a permit and submitting payment, I understand and acknowledge that all fees are
+                        non-refundable.
+                    </Text>
                 </View>
-              </View>
-            </View> 
-            <hr style={styles.divider} />
-
-           <View>
-            <View style={styles.row}>
-                <Text style={styles.text}>
-                  Card: 
-                </Text>
-              <Text style={styles.text}>
-              {paymentData.operation?.creditCardPan}
-              </Text>
-            </View>
-            <View style={styles.row}>
-                <Text style={styles.text}>
-                  Pay With:
-                </Text>
-              <Text style={styles.text}>
-              {PayWith[paymentData.billing.payWith || 0]}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              
-                <Text style={styles.text}>
-                 Plate
-                </Text>
-              <Text style={styles.text}>{plate}</Text>
-            </View>
-          </View>
-          </View>
-          </View>
-
-          
-          <hr style={styles.divider} />
-
-          {/* Información de precios */}
-          <View>
-            <View style={styles.row}>
-             <Text style={{...styles.text, ...styles.boldText}}>
-                Amount:
-              </Text>
-              <Text style={{...styles.text, ...styles.boldText}}>
-              {!isNaN(paymentData.billing.step.amountPlusVat)
-                    ? new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                        maximumFractionDigits: 2,
-                        notation: "compact",
-                      }).format(paymentData.billing.step.amountPlusVat)
-                    : '-'}
-              </Text>
-            </View>
-            <View style={styles.row}>
-             <Text style={{...styles.text, ...styles.boldText}}>
-                Fees:
-              </Text>
-              <Text style={{...styles.text, ...styles.boldText}}>
-              {!isNaN(paymentData.billing.step.feePlusVat)
-                    ? new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                        maximumFractionDigits: 2,
-                        notation: "compact",
-                      }).format(paymentData.billing.step.feePlusVat)
-                    : '-'}
-              </Text>
-            </View>
-            <View style={styles.row}>
-             <Text style={{...styles.text, ...styles.boldText}}>
-                Total:
-              </Text>
-              <Text style={{...styles.text, ...styles.boldText}}>
-                {!isNaN(paymentData.billing.step.total)
-                  ? new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                      maximumFractionDigits: 2,
-                      notation: "compact",
-                    }).format(paymentData.billing.step.total)
-                  : '-'}
-              </Text>
-            </View>
-          </View> 
-        </View>
-      </Page>
-    </Document>
-  );
+            </Page>
+        </Document>
+    );
 };
 
 export default PermitTicket;
