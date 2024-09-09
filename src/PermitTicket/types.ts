@@ -1,37 +1,10 @@
 export interface PermitTicketProps {
-    paymentData: InvoiceData;
+    paymentData: PaymentResult;
+    vehicle: VehicleResult;
+    address: Address;
+    user: UserInfo;
+    permitType: string;
     logo: any;
-}
-
-interface Recipient {
-    name: string;
-    email: string;
-    address: string;
-    cityStateZip: string;
-}
-
-interface Transaction {
-    number: string;
-    date: string;
-    type: string;
-    cardAmount: string;
-    amount: string;
-}
-
-interface Invoice {
-    date: string;
-    number: string;
-    description: string;
-    price: number;
-    total: number;
-}
-
-export interface InvoiceData {
-    recipient: Recipient;
-    transaction: Transaction;
-    invoices: Invoice[];
-    convenienceFee: number;
-    totalAmount: number;
 }
 
 export enum PaymentStatus {
@@ -146,4 +119,72 @@ export interface ParkingOperationStep {
     time: number;
     /** @format int32 */
     timeBalanceUsed: number;
+}
+
+export interface VehicleResult {
+    id: string;
+    plate: string;
+    data: VehicleData;
+    customData: CustomDataEntry[];
+}
+
+export interface VehicleData {
+    nickname?: string | null;
+    color?: string | null;
+    model?: string | null;
+    type?: string | null;
+    province?: string | null;
+}
+
+export interface CustomDataEntry {
+    key: string;
+    value: string;
+}
+
+export interface UserInfo {
+    givenName?: string | null;
+    familyName?: string | null;
+    email: string;
+}
+
+export interface Address {
+    postalCode?: string | null;
+    state?: string | null;
+    city?: string | null;
+    street?: string | null;
+    streetNumber?: string | null;
+    unit?: AddressUnit;
+}
+
+export interface AddressUnit {
+    designator?: AddressUnitDesignator;
+    unit: string;
+}
+
+export enum AddressUnitDesignator {
+    None = 0,
+    Apartment = 1,
+    Basement = 2,
+    Building = 3,
+    Department = 4,
+    Floor = 5,
+    Front = 6,
+    Hanger = 7,
+    Key = 8,
+    Lobby = 9,
+    Lot = 10,
+    Lower = 11,
+    Office = 12,
+    Penthouse = 13,
+    Pier = 14,
+    Rear = 15,
+    Room = 16,
+    Side = 17,
+    Slip = 18,
+    Space = 19,
+    Stop = 20,
+    Suite = 21,
+    Trailer = 22,
+    Unit = 23,
+    Upper = 24
 }

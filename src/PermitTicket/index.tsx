@@ -1,14 +1,35 @@
 import React from "react";
 import { IconButton } from "@mui/material";
 import { Stack } from "@mui/system";
-import { PermitTicketProps, InvoiceData } from "./types";
-import { Page, Text, View, Document, StyleSheet, usePDF, DocumentProps } from "@react-pdf/renderer";
+import { PayWith, PermitTicketProps } from "./types";
+import { Page, Text, View, Document, StyleSheet, usePDF } from "@react-pdf/renderer";
 import DownloadIcon from "@mui/icons-material/Download";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Logo from "./logo";
 
 dayjs.extend(utc);
+
+const formatCurrency = ({
+    value,
+    factor = 0.01,
+    currency = "USD"
+}: {
+    value: number;
+    factor?: number;
+    currency?: string;
+}): string => {
+    if (value == null) {
+        return "-";
+    }
+
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currency,
+        maximumFractionDigits: 2,
+        notation: "compact"
+    }).format(value * factor);
+};
 
 const styles = StyleSheet.create({
     page: {
@@ -73,9 +94,18 @@ const styles = StyleSheet.create({
     }
 });
 
-const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo }) => {
+const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, permitType, address, vehicle }) => {
     const [{ loading, error, ...instance }] = usePDF({
-        document: <PDFDocument data={paymentData} logo={logo} />
+        document: (
+            <PDFDocument
+                paymentData={paymentData}
+                logo={logo}
+                user={user}
+                permitType={permitType}
+                address={address}
+                vehicle={vehicle}
+            />
+        )
     });
 
     console.log({
@@ -115,18 +145,29 @@ const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo }) => {
                 <DownloadIcon fontSize="small" />
             </IconButton>
             <Stack>
-                <PDFDocument data={paymentData} logo={logo}></PDFDocument>
+                <PDFDocument
+                    paymentData={paymentData}
+                    logo={logo}
+                    user={user}
+                    permitType={permitType}
+                    address={address}
+                    vehicle={vehicle}
+                    isWeb
+                ></PDFDocument>
             </Stack>
         </Stack>
     );
 };
 
-interface PDFDocumentProps extends DocumentProps {
-    data: any;
-    logo: any;
-}
-
-const PDFDocument: React.FC<PDFDocumentProps> = ({ data }: { data: InvoiceData }) => {
+const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
+    paymentData,
+    user,
+    permitType,
+    address,
+    vehicle,
+    logo,
+    isWeb
+}) => {
     return (
         <Document>
             <Page size={"A4"} style={styles.page}>
@@ -137,36 +178,49 @@ const PDFDocument: React.FC<PDFDocumentProps> = ({ data }: { data: InvoiceData }
                             <Text>232 Boulevard of the Allies</Text>
                             <Text>Pittsburgh, PA, 15222</Text>
                         </View>
-                        <View style={styles.columnBlock}>
-                            <Logo />
-                        </View>
+                        <View style={styles.columnBlock}>{isWeb ? <img src={logo} alt="logo" /> : <Logo />}</View>
                     </View>
                     <View style={styles.rowBlock}>
-                        <View style={styles.columnBlock}>
-                            <Text>{data.recipient.name}</Text>
-                            <Text>{data.recipient.email}</Text>
-                            <Text>{data.recipient.address}</Text>
-                            <Text>{data.recipient.cityStateZip}</Text>
+                        <View style={{ ...styles.rowBlock, gap: 10 }}>
+                            <Text>TO</Text>
+                            <View style={styles.columnBlock}>
+                                <Text>{`${user.givenName} ${user.familyName}`}</Text>
+                                <Text>{user.email}</Text>
+                                <Text>{`${address.streetNumber} ${address.street}`}</Text>
+                                <Text>{`${address.city}, ${address.state}, ${address.postalCode}`}</Text>
+                            </View>
                         </View>
 
                         <View style={{ ...styles.rowBlock, gap: 8 }}>
-                            <View style={styles.columnBlock}>
-                                <Text style={{ textAlign: "right" }}>Transaction #:</Text>
-                                <Text style={{ textAlign: "right" }}>DATE:</Text>
-                                <Text style={{ textAlign: "right" }}>Card/Cheque Amount#:</Text>
-                                <Text style={{ textAlign: "right" }}>Type:</Text>
-                                <Text style={{ textAlign: "right" }}>Ammount:</Text>
+                            <View style={{ ...styles.columnBlock, alignItems: "flex-end", textAlign: "right" }}>
+                                <Text>Transaction #:</Text>
+                                <Text>DATE:</Text>
+                                <Text>Type:</Text>
+                                {/* <Text>Card/Cheque Amount#:</Text> */}
+                                <Text>Ammount:</Text>
                             </View>
                             <View style={styles.columnBlock}>
-                                <Text style={{ color: "red" }}>{data.transaction.number}</Text>
-                                <Text>{dayjs(data.transaction.date).format("MM/DD/YYYY")}</Text>
-                                <Text>{data.transaction.cardAmount}</Text>
-                                <Text>{data.transaction.type}</Text>
-                                <Text>{data.transaction.amount}</Text>
+                                <Text style={{ color: "red" }}>{paymentData.operation?.id || "-"}</Text>
+                                <Text>-</Text>
+                                <Text>
+                                    {paymentData.billing.payWith !== null && paymentData.billing.payWith !== undefined
+                                        ? PayWith[paymentData.billing.payWith]
+                                        : "-"}
+                                </Text>
+                                {/* <Text>4875</Text> */}
+                                <Text>{formatCurrency({ value: paymentData.billing.step.total })}</Text>
                             </View>
                         </View>
                     </View>
-                    <View style={{ display: "flex", justifyContent: "center", marginTop: 30 }}>
+                    <View
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            marginTop: 30,
+                            textAlign: "center",
+                            width: "100%"
+                        }}
+                    >
                         <Text style={{ fontSize: 16, marginBottom: 10 }}>Invoices</Text>
                     </View>
 
@@ -175,10 +229,10 @@ const PDFDocument: React.FC<PDFDocumentProps> = ({ data }: { data: InvoiceData }
                             <View style={{ ...styles.tableCol, ...styles.withBorderLeft, ...styles.withBorderTop }}>
                                 <Text style={styles.tableCell}>Date</Text>
                             </View>
-                            <View style={{ ...styles.tableCol, ...styles.withBorderTop }}>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderTop, flexBasis: "20.57%" }}>
                                 <Text style={styles.tableCell}>Invoice#</Text>
                             </View>
-                            <View style={{ ...styles.tableCol, ...styles.withBorderTop, flexBasis: "42.856%" }}>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderTop, flexBasis: "36.57%" }}>
                                 <Text style={styles.tableCell}>Description</Text>
                             </View>
                             <View style={{ ...styles.tableCol, ...styles.withBorderTop }}>
@@ -188,37 +242,50 @@ const PDFDocument: React.FC<PDFDocumentProps> = ({ data }: { data: InvoiceData }
                                 <Text style={styles.tableCell}>Total</Text>
                             </View>
                         </View>
-                        {data.invoices.map((invoice, index) => (
-                            <View style={styles.tableRow} key={index}>
-                                <View style={{ ...styles.tableCol, ...styles.withBorderLeft }}>
-                                    <Text style={styles.tableCell}>{dayjs(invoice.date).format("MM/DD/YYYY")}</Text>
-                                </View>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCell}>{invoice.number}</Text>
-                                </View>
-                                <View
-                                    style={{
-                                        ...styles.tableCol,
-                                        flexBasis: "42.856%"
-                                    }}
-                                >
-                                    <Text style={styles.tableCell}>{invoice.description}</Text>
-                                </View>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCell}>${invoice.price.toFixed(2)}</Text>
-                                </View>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCell}>${invoice.total.toFixed(2)}</Text>
-                                </View>
+                        <View style={styles.tableRow}>
+                            <View style={{ ...styles.tableCol, ...styles.withBorderLeft }}>
+                                <Text style={styles.tableCell}>-</Text>
                             </View>
-                        ))}
+                            <View
+                                style={{
+                                    ...styles.tableCol,
+                                    flexBasis: "20.57%"
+                                }}
+                            >
+                                <Text
+                                    style={styles.tableCell}
+                                >{`${dayjs.utc(paymentData.billing.startDate).format("MMYYYY")}-${paymentData.operation?.id}`}</Text>
+                            </View>
+                            <View
+                                style={{
+                                    ...styles.tableCol,
+                                    flexBasis: "36.57%"
+                                }}
+                            >
+                                <Text style={styles.tableCell}>
+                                    {`${permitType} - (${dayjs.utc(paymentData.billing.startDate).format("MM/DD/YYYY")} - ${dayjs.utc(paymentData.billing.step.endDate).format("MM/DD/YYYY")}) - ${vehicle.data.model} ${vehicle.plate}`}
+                                </Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>
+                                    {formatCurrency({ value: paymentData.billing.step.amount })}
+                                </Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>
+                                    {formatCurrency({ value: paymentData.billing.step.amount })}
+                                </Text>
+                            </View>
+                        </View>
                         <View style={styles.tableRow}>
                             <View style={{ ...styles.tableCol, borderBottomWidth: 0 }}></View>
                             <View style={{ ...styles.tableCol }}>
                                 <Text style={styles.tableCell}>Convenience Fee:</Text>
                             </View>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>${data.convenienceFee.toFixed(2)}</Text>
+                                <Text style={styles.tableCell}>
+                                    {formatCurrency({ value: paymentData.billing.step.feePlusVat })}
+                                </Text>
                             </View>
                         </View>
                         <View style={styles.tableRow}>
@@ -227,7 +294,9 @@ const PDFDocument: React.FC<PDFDocumentProps> = ({ data }: { data: InvoiceData }
                                 <Text style={styles.tableCell}>Total:</Text>
                             </View>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>${data.totalAmount.toFixed(2)}</Text>
+                                <Text style={styles.tableCell}>
+                                    {formatCurrency({ value: paymentData.billing.step.total })}
+                                </Text>
                             </View>
                         </View>
                     </View>
