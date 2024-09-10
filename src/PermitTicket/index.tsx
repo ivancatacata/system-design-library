@@ -206,7 +206,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
                                 </Text>
                                 <Text>
                                     {paymentData.billing.payWith !== null && paymentData.billing.payWith !== undefined
-                                        ? PayWith[paymentData.billing.payWith]
+                                        ? PayWith[paymentData.billing.payWith] || "-"
                                         : "-"}
                                 </Text>
                                 {/* <Text>4875</Text> */}
