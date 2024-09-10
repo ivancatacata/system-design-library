@@ -49,7 +49,7 @@ export enum FeeDisplayLayout {
 
 export interface PaymentResult {
     billing: BillingResult;
-    BilledOn: string;
+    billedOn: string;
     operation?: IntegraParkingOperation;
     /**
      *
