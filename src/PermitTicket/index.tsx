@@ -283,7 +283,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
                         </View>
                         <View style={styles.tableRow}>
                             <View style={{ ...styles.tableCol, borderBottomWidth: 0 }}></View>
-                            <View style={{ ...styles.tableCol }}>
+                            <View style={{ ...styles.tableCol, maxWidth: "14.27%" }}>
                                 <Text style={styles.tableCell}>Convenience Fee:</Text>
                             </View>
                             <View style={styles.tableCol}>
