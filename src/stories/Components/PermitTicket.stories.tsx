@@ -61,6 +61,7 @@ export const Default: StoryFn = (args) => {
                     paymentError: null,
                     deferred: false
                 },
+                zone: "DD",
                 vehicle: {
                     id: "abc123",
                     plate: "XYZ 1234",

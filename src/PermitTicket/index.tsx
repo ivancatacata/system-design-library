@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     }
 });
 
-const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, permitType, address, vehicle }) => {
+const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, permitType, address, vehicle, zone }) => {
     const [{ loading, error, ...instance }] = usePDF({
         document: (
             <PDFDocument
@@ -103,6 +103,7 @@ const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, pe
                 user={user}
                 permitType={permitType}
                 address={address}
+                zone={zone}
                 vehicle={vehicle}
             />
         )
@@ -152,6 +153,7 @@ const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, pe
                     permitType={permitType}
                     address={address}
                     vehicle={vehicle}
+                    zone={zone}
                     isWeb
                 ></PDFDocument>
             </Stack>
@@ -166,6 +168,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
     address,
     vehicle,
     logo,
+    zone,
     isWeb
 }) => {
     return (
@@ -266,9 +269,14 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
                                     flexBasis: "36.57%"
                                 }}
                             >
-                                <Text style={styles.tableCell}>
-                                    {`${permitType} - (${dayjs.utc(paymentData.billing.startDate).format("MM/DD/YYYY")} - ${dayjs.utc(paymentData.billing.step.endDate).format("MM/DD/YYYY")}) - ${vehicle.data.model} ${vehicle.plate}`}
-                                </Text>
+                                <View style={{ ...styles.tableCell, flexDirection: "column" }}>
+                                    <Text>{`${permitType}`}</Text>
+                                    <Text>
+                                        {`(${dayjs.utc(paymentData.billing.startDate).format("MM/DD/YYYY")} - ${dayjs.utc(paymentData.billing.step.endDate).format("MM/DD/YYYY")})`}
+                                    </Text>
+                                    <Text>{`${vehicle.data.model} ${vehicle.plate}`}</Text>
+                                    <Text>{zone}</Text>
+                                </View>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}>

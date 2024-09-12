@@ -4,6 +4,7 @@ export interface PermitTicketProps {
     address: Address;
     user: UserInfo;
     permitType: string;
+    zone: string;
     logo: any;
 }
 
