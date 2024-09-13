@@ -21,6 +21,8 @@ export interface IntegraParkingOperation {
     id: string;
     /** @format date-time */
     startDate: string;
+    /** @format date-time */
+    billedOn: string;
     step: ParkingOperationStep;
     /** @format int32 */
     balance: number;
@@ -50,8 +52,7 @@ export enum FeeDisplayLayout {
 
 export interface PaymentResult {
     billing: BillingResult;
-    billedOn: string;
-    operation?: IntegraParkingOperation;
+    operation: IntegraParkingOperation;
     /**
      *
      *
@@ -66,7 +67,7 @@ export interface PaymentResult {
      * 4 = Rejected
      */
     status: PaymentStatus;
-    paymentError?: string | null;
+    paymentError: string | null;
     deferred: boolean;
 }
 

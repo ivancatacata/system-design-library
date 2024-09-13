@@ -205,7 +205,9 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
                             <View style={styles.columnBlock}>
                                 <Text style={{ color: "red" }}>{paymentData.operation?.id || "-"}</Text>
                                 <Text>
-                                    {paymentData.billedOn ? dayjs.utc(paymentData.billedOn).format("MM/DD/YYYY") : "-"}
+                                    {paymentData?.operation?.billedOn
+                                        ? dayjs.utc(paymentData?.operation?.billedOn).format("MM/DD/YYYY")
+                                        : "-"}
                                 </Text>
                                 <Text>
                                     {paymentData.billing.payWith !== null && paymentData.billing.payWith !== undefined
@@ -250,7 +252,9 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
                         <View style={styles.tableRow}>
                             <View style={{ ...styles.tableCol, ...styles.withBorderLeft }}>
                                 <Text style={styles.tableCell}>
-                                    {paymentData.billedOn ? dayjs.utc(paymentData.billedOn).format("MM/DD/YYYY") : "-"}
+                                    {paymentData?.operation?.billedOn
+                                        ? dayjs.utc(paymentData?.operation?.billedOn).format("MM/DD/YYYY")
+                                        : "-"}
                                 </Text>
                             </View>
                             <View

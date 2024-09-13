@@ -13,7 +13,6 @@ export const Default: StoryFn = (args) => {
         <PermitTicket
             {...{
                 paymentData: {
-                    billedOn: "2024-09-01T10:00:00Z",
                     billing: {
                         startDate: "2024-09-01T10:00:00Z",
                         step: {
@@ -36,6 +35,7 @@ export const Default: StoryFn = (args) => {
                     },
                     operation: {
                         id: "123456789",
+                        billedOn: "2024-09-01T10:00:00Z",
                         startDate: "2024-09-01T10:00:00Z",
                         step: {
                             endDate: "2024-09-01T12:00:00Z",
