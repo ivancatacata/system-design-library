@@ -91,6 +91,9 @@ export interface BillingResult {
 
 export enum PayWith {
     PaymentGateway = 0,
+    Cash = 4,
+    Check = 6,
+    CreditCard = 8,
     BankTransfer = 10,
     PayrollDiscount = 11
 }

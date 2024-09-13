@@ -94,7 +94,16 @@ const styles = StyleSheet.create({
     }
 });
 
-const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, permitType, address, vehicle, zone }) => {
+const PermitTicket: React.FC<PermitTicketProps & { t: any }> = ({
+    paymentData,
+    logo,
+    user,
+    permitType,
+    address,
+    vehicle,
+    zone,
+    t
+}) => {
     const [{ loading, error, ...instance }] = usePDF({
         document: (
             <PDFDocument
@@ -105,14 +114,9 @@ const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, pe
                 address={address}
                 zone={zone}
                 vehicle={vehicle}
+                t={t}
             />
         )
-    });
-
-    console.log({
-        paymentData,
-        loading,
-        error
     });
 
     const downloadFile = () => {
@@ -154,6 +158,7 @@ const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, pe
                     address={address}
                     vehicle={vehicle}
                     zone={zone}
+                    t={t}
                     isWeb
                 ></PDFDocument>
             </Stack>
@@ -161,7 +166,7 @@ const PermitTicket: React.FC<PermitTicketProps> = ({ paymentData, logo, user, pe
     );
 };
 
-const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
+const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean; t: any }> = ({
     paymentData,
     user,
     permitType,
@@ -169,7 +174,8 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
     vehicle,
     logo,
     zone,
-    isWeb
+    isWeb,
+    t
 }) => {
     return (
         <Document>
@@ -211,7 +217,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean }> = ({
                                 </Text>
                                 <Text>
                                     {paymentData.billing.payWith !== null && paymentData.billing.payWith !== undefined
-                                        ? PayWith[paymentData.billing.payWith] || "-"
+                                        ? t(PayWith[paymentData.billing.payWith]) || "-"
                                         : "-"}
                                 </Text>
                                 {/* <Text>4875</Text> */}

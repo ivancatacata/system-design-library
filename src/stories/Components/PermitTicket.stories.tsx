@@ -11,6 +11,7 @@ export default {
 export const Default: StoryFn = (args) => {
     return (
         <PermitTicket
+            t={(string: string) => `test-${string}`}
             {...{
                 paymentData: {
                     billing: {
