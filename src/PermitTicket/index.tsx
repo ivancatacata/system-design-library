@@ -195,7 +195,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean; t: any }> = (
                             <View style={styles.columnBlock}>
                                 <Text>{`${user.givenName} ${user.familyName}`}</Text>
                                 <Text>{user.email}</Text>
-                                <Text>{`${address.streetNumber} ${address.street}`}</Text>
+                                <Text>{`${address.streetNumber} ${address.street}${address.unit?.unit ? ", " + address.unit.unit : ""}`}</Text>
                                 <Text>{`${address.city}, ${address.state}, ${address.postalCode}`}</Text>
                             </View>
                         </View>
