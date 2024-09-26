@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         fontFamily: "Helvetica",
         flexDirection: "column",
         backgroundColor: "#FFFFFF",
-        minHeight: "100vh",
+        height: "100%",
         padding: 30
     },
     columnBlock: {
@@ -89,6 +89,11 @@ const styles = StyleSheet.create({
     withBorderLeft: {
         borderLeftWidth: 1
     },
+    footer: {
+        display: "flex",
+        flexDirection: "column",
+        fontSize: 10
+    },
     disclaimer: {
         marginTop: 20
     }
@@ -120,7 +125,6 @@ const PermitTicket: React.FC<PermitTicketProps & { t: any }> = ({
     });
 
     const downloadFile = () => {
-        console.log(instance.blob);
         let documentObjectURL;
         if (instance.blob) {
             documentObjectURL = URL.createObjectURL(instance.blob);
@@ -179,7 +183,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean; t: any }> = (
 }) => {
     return (
         <Document>
-            <Page size={"A4"} style={styles.page}>
+            <Page size={"LETTER"} style={{ ...styles.page, ...(isWeb ? { minHeight: 700 } : {}) }}>
                 <View style={{ flexGrow: 1 }}>
                     <View style={{ ...styles.rowBlock, marginBottom: 30 }}>
                         <View style={styles.columnBlock}>
@@ -209,7 +213,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean; t: any }> = (
                                 <Text>Ammount:</Text>
                             </View>
                             <View style={styles.columnBlock}>
-                                <Text style={{ color: "red" }}>{paymentData.operation?.id || "-"}</Text>
+                                <Text>{paymentData.operation?.id || "-"}</Text>
                                 <Text>
                                     {paymentData?.operation?.billedOn
                                         ? dayjs.utc(paymentData?.operation?.billedOn).format("MM/DD/YYYY")
@@ -323,7 +327,7 @@ const PDFDocument: React.FC<PermitTicketProps & { isWeb?: boolean; t: any }> = (
                         </View>
                     </View>
                 </View>
-                <View style={{ display: "flex", flexDirection: "column", fontSize: 10 }}>
+                <View style={styles.footer}>
                     <Text>Disclaimer:</Text>
                     <Text style={styles.disclaimer}>
                         I am a resident of the city, and that i am the owner of the motor vehicle(s) herein described. I
