@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { IconButton } from "@mui/material";
 import { Stack } from "@mui/system";
 import { PayWith, PermitTicketProps } from "./types";
