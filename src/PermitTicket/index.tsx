@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useRef } from "react";
 import { IconButton } from "@mui/material";
 import { Stack } from "@mui/system";
 import { PayWith, PermitTicketProps } from "./types";
 import { Page, Text, View, Document, StyleSheet, usePDF } from "@react-pdf/renderer";
 import DownloadIcon from "@mui/icons-material/Download";
+import PrintIcon from "@mui/icons-material/Print";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Logo from "./logo";
@@ -139,11 +140,27 @@ const PermitTicket: React.FC<PermitTicketProps & { t: any }> = ({
             document.body.removeChild(a);
         }
     };
+    const printFile = () => {
+        if (instance.blob) {
+            const documentObjectURL = URL.createObjectURL(instance.blob);
 
+            const iframe = document.createElement("iframe"); //load content in an iframe to print later
+            document.body.appendChild(iframe);
+
+            iframe.style.display = "none";
+            iframe.src = documentObjectURL;
+            iframe.onload = function () {
+                setTimeout(function () {
+                    iframe.focus();
+                    iframe.contentWindow?.print();
+                }, 1);
+            };
+        }
+    };
     return (
         <Stack spacing={2} position={"relative"} py={1} pt={3} px={1.5}>
-            <IconButton
-                onClick={downloadFile}
+            <Stack
+                direction="row"
                 sx={{
                     position: "absolute",
                     top: ".2rem",
@@ -151,8 +168,13 @@ const PermitTicket: React.FC<PermitTicketProps & { t: any }> = ({
                     zIndex: 3
                 }}
             >
-                <DownloadIcon fontSize="small" />
-            </IconButton>
+                <IconButton onClick={downloadFile}>
+                    <DownloadIcon fontSize="small" />
+                </IconButton>
+                <IconButton onClick={printFile}>
+                    <PrintIcon fontSize="small" />
+                </IconButton>
+            </Stack>
             <Stack>
                 <PDFDocument
                     paymentData={paymentData}
